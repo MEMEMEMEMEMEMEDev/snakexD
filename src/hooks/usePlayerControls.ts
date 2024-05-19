@@ -5,6 +5,7 @@ interface Controls {
   down: boolean;
   left: boolean;
   right: boolean;
+  jump: boolean; // Agregar soporte para salto
 }
 
 const usePlayerControls = (): Controls => {
@@ -13,6 +14,7 @@ const usePlayerControls = (): Controls => {
     down: false,
     left: false,
     right: false,
+    jump: false, // Inicializar el estado del salto
   });
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -28,6 +30,9 @@ const usePlayerControls = (): Controls => {
         break;
       case "KeyD":
         setMovement((m) => ({ ...m, right: true }));
+        break;
+      case "Space": // Reconocer la barra espaciadora
+        setMovement((m) => ({ ...m, jump: true }));
         break;
     }
   }, []);
@@ -45,6 +50,9 @@ const usePlayerControls = (): Controls => {
         break;
       case "KeyD":
         setMovement((m) => ({ ...m, right: false }));
+        break;
+      case "Space": // Reconocer cuando la barra espaciadora se suelta
+        setMovement((m) => ({ ...m, jump: false }));
         break;
     }
   }, []);

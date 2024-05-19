@@ -23,8 +23,9 @@ const Snake: React.FC<SnakeProps> = ({
   const direction = useRef<[number, number, number]>([0, 1, 0]);
   const nextDirection = useRef<[number, number, number]>([0, 1, 0]);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [isJumping, setIsJumping] = useState(false);
   const controls = usePlayerControls();
-  const speed = 0.03;
+  const speed = 0.09;
   const time = useRef(0);
 
   useEffect(() => {
@@ -32,13 +33,17 @@ const Snake: React.FC<SnakeProps> = ({
   }, [position, onUpdatePositions]);
 
   const handleControlChange = useCallback(() => {
-    const { up, down, left, right } = controls;
+    const { up, down, left, right, jump } = controls;
     const [x, y] = direction.current;
     if (up && y === 0) nextDirection.current = [0, 1, 0];
     if (down && y === 0) nextDirection.current = [0, -1, 0];
     if (left && x === 0) nextDirection.current = [-1, 0, 0];
     if (right && x === 0) nextDirection.current = [1, 0, 0];
-  }, [controls]);
+    if (jump && !isJumping) {
+      setIsJumping(true);
+      setTimeout(() => setIsJumping(false), 500); // Saltar durante 500ms
+    }
+  }, [controls, isJumping]);
 
   useEffect(() => {
     handleControlChange();
@@ -51,6 +56,13 @@ const Snake: React.FC<SnakeProps> = ({
     if (time.current > speed) {
       time.current = 0;
       moveSnake();
+
+      if (controls.jump) {
+        position[0][2] += 1;
+        setTimeout(() => {
+          position[0][2] -= 1;
+        }, 400);
+      }
     }
   });
 
@@ -59,6 +71,12 @@ const Snake: React.FC<SnakeProps> = ({
     const newHead = position[0].map(
       (pos, idx) => pos + direction.current[idx]
     ) as [number, number, number];
+
+    if (isJumping) {
+      newHead[2] = 1; // Eleva la serpiente en el eje Z
+    } else {
+      newHead[2] = 0; // Asegura que la serpiente regrese a Z=0
+    }
 
     checkCollision(newHead);
     updateSnakePosition(newHead);
@@ -97,7 +115,12 @@ const Snake: React.FC<SnakeProps> = ({
   return (
     <>
       {position.map((pos, index) => (
-        <mesh key={index} position={pos}>
+        <mesh
+          key={index}
+          position={pos}
+          castShadow // Habilita la proyección de sombras
+          receiveShadow // Habilita la recepción de sombras
+        >
           <boxGeometry args={[1, 1, 1]} />
           <meshStandardMaterial color="black" />
         </mesh>

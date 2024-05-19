@@ -9,9 +9,9 @@ interface IGame {
   endGame: () => void;
 }
 
-const CAMERA_POSITION: [number, number, number] = [0, -30, 20];
+const CAMERA_POSITION: [number, number, number] = [0, -35, 20];
 const CAMERA_TARGET: [number, number, number] = [0, 0, 0];
-const ZOOM = 3;
+const ZOOM = 2;
 
 const Game: React.FC<IGame> = ({ endGame }) => {
   const boardSize = 9;
@@ -55,7 +55,7 @@ const Game: React.FC<IGame> = ({ endGame }) => {
   return (
     <div className="game">
       <Canvas
-        shadows
+        shadows // Habilitar soporte de sombras en el Canvas
         camera={{
           position: CAMERA_POSITION,
           fov: 75,
@@ -68,7 +68,19 @@ const Game: React.FC<IGame> = ({ endGame }) => {
         }}
       >
         <ambientLight intensity={0.5} />
-        <directionalLight position={[5, 5, 5]} intensity={1} castShadow />
+        <directionalLight
+          position={[0, -2, 1]} // Asegúrate de que la posición sea óptima para tu escena
+          intensity={1}
+          castShadow
+          shadow-mapSize-width={2048} // Aumenta para mejorar la calidad de la sombra
+          shadow-mapSize-height={2048}
+          shadow-camera-near={0.5}
+          shadow-camera-far={50}
+          shadow-camera-left={-10} // Ajusta según el tamaño de tu escena
+          shadow-camera-right={10}
+          shadow-camera-top={10}
+          shadow-camera-bottom={-10}
+        />
         <Physics>
           <Snake
             endGame={endGame}

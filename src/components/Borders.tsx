@@ -64,7 +64,7 @@ const Borders: React.FC = () => {
 
   return (
     <>
-      <mesh ref={floor}>
+      <mesh ref={floor} castShadow receiveShadow>
         <boxGeometry
           args={[
             size * 2 + WALL_THICKNESS * 2 + offset * 2,
